@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StellarBeam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            color: #2e3d58;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>StellarBeam</h1>
+        <p>Your Public Key: <span id="public-key"></span></p>
+        <p><a href="https://friendbot.stellar.org/?addr=YOUR_PUBLIC_KEY" target="_blank">Fund your account with Friendbot</a></p>
+
+        <label for="destination">Destination Account:</label>
+        <input type="text" id="destination" class="input-field" placeholder="Enter destination Stellar address">
+        
+        <label for="amount">Amount (XLM):</label>
+        <input type="number" id="amount" class="input-field" placeholder="Enter amount" min="0.1" step="0.1">
+
+        <button class="button" onclick="sendXLM()">Send XLM</button>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        // Replace with your generated public key for testing
+        const publicKey = "YOUR_PUBLIC_KEY_HERE";  // You can generate a keypair with the Stellar SDK or any keypair generator
+        document.getElementById('public-key').textContent = publicKey;
+
+        function sendXLM() {
+            const destination = document.getElementById('destination').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!destination || !amount) {
+                displayMessage('Please provide both destination account and amount.', 'error');
+                return;
+            }
+
+            fetch(`https://horizon-testnet.stellar.org/accounts/${publicKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const sequence = data.sequence;
+
+                    // Create the payment operation request
+                    const transaction = {
+                        source_account: publicKey,
+                        destination_account: destination,
+                        amount: amount,
+                        sequence: sequence,
+                        network_passphrase: "Test SDF Network ; September 2015",
+                        asset_code: "XLM"
+                    };
+
+                    // Submit the transaction (mock API request)
+                    // Here we would normally use Stellar SDK or a backend server to sign and submit
+                    submitTransaction(transaction);
+                })
+                .catch(error => {
+                    displayMessage('Account not found. Please fund your account using Friendbot.', 'error');
+                });
+        }
+
+        function submitTransaction(transaction) {
+            // For demonstration purposes, we simulate success
+            setTimeout(() => {
+                displayMessage('Transaction Successful!', 'success');
+                console.log(transaction);  // Logs the transaction object for testing
+            }, 2000);
+        }
+
+        function displayMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.className = 'message ' + (type === 'success' ? 'success' : 'error');
+        }
+    </script>
+</body>
+</html>
